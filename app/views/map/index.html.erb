@@ -1,0 +1,14 @@
+<div class="map-container">
+    <div id="map"></div>
+</div>
+
+<script>
+  (function($, newMap) {
+    $(function(){
+      new newMap({
+        hubs: <%=raw @hubs_hash.to_json %>,
+        orders: <%=raw @orders_hash.to_json %>
+      }).bind();
+    });
+  }(jQuery, SprigMap.New));
+</script>
