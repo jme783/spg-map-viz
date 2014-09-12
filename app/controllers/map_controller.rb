@@ -7,15 +7,20 @@ class MapController < ApplicationController
       marker.lat hub.latitude
       marker.lng hub.longitude
       marker.title "Hub #" + hub.id.to_s
+      marker.picture({
+         :url => view_context.image_path("hub-#{hub.id.to_s}.png"),
+         :width   => 32,
+         :height  => 32
+      })
     end
     @orders_hash= Gmaps4rails.build_markers(@orders) do |order, marker|
       marker.lat order.latitude
       marker.lng order.longitude
       marker.title "Order #" + order.id.to_s
       marker.picture({
-         :url => "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=A|007FFF|000000", # up to you to pass the proper parameters in the url, I guess with a method from device
-         :width   => 32,
-         :height  => 32
+         :url => view_context.image_path("order-hub-#{order.hub.id.to_s}.png"),
+         :width   => 16,
+         :height  => 16
       })
     end
 
