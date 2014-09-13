@@ -5,6 +5,9 @@ Rails.application.routes.draw do
   # You can have the root of your site routed with "root"
   root 'map#index'
 
+  # Orders API to filter by hub
+  get "orders" => "orders#find_by_hub", as: "orders"
+
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 
