@@ -4,6 +4,7 @@ window.SprigMap = window.SprigMap || {}
     this.hubs = options.hubs
     this.orders = options.orders
     this.handler = Gmaps.build('Google')
+    this.hubChecks = options.hubChecks
     # Style Google Maps
     this.style_array = [
       {
@@ -104,52 +105,74 @@ window.SprigMap = window.SprigMap || {}
 
   New::bind = ->
     this.initializeMap()
+    this.hubCheckBoxChange()
 
   New::initializeMap = ->
     self = this
     self.handler.buildMap
       provider:
         center: new google.maps.LatLng(37.7833, -122.4167)
-        zoom: 13
+        zoom: 14
         styles: self.style_array
 
       internal:
         id: "map"
     , ->
-      console.log self
       self.addHubMapMarkers self.hubs
 
 
   New::addHubMapMarkers = (hash) ->
     handler = this.handler
-    markers = handler.addMarkers(hash)
+    markers = handler.addMarkers(hash, {opacity: 1, zIndex: 10, clickable: false})
+    handler.bounds.extendWith markers
+
+  New::addOrderMapMarkers = (hash, hub_id) ->
+    handler = this.handler
+    markers = handler.addMarkers(hash, {zIndex: 1})
+    # Attach the markers to the SprigMap opject
+    markersNameVariable = "markersForHub" + hub_id
+    if !SprigMap[markersNameVariable]
+      SprigMap[markersNameVariable] = markers
+    # Bound the markers to the map
     handler.bounds.extendWith markers
     handler.fitMapToBounds()
-    this.loadHubOrders(markers)
+    $(".ajax-loader").hide()
 
-  New::addOrderMapMarkers = (hash) ->
-    handler = this.handler
-    markers = handler.addMarkers(hash)
-    handler.bounds.extendWith markers
 
-  New::loadHubOrders = (hub_markers) ->
+   New::loadOrders = (hub_id) ->
+    $(".ajax-loader").show()
+    self = this
+    $.ajax
+      url: "/orders"
+      data:
+        hub_id: hub_id
+
+      success: (response) ->
+        self.addOrderMapMarkers(response, hub_id)
+      error: (xhr) ->
+        console.log(xhr)
+
+   New::hubCheckBoxChange = ->
      self = this
-     i = 0
-     while i < hub_markers.length
-       marker = hub_markers[i].serviceObject
-       google.maps.event.addListener marker, "click", ->
-        marker_id = this.title.match(/\d+/)[0]
-        $.ajax
-          url: "/orders"
-          data:
-            hub_id: marker_id
-
-          success: (response) ->
-            self.addOrderMapMarkers(response)
-          error: (xhr) ->
-            console.log(xhr)
-       ++i
-     return
+     self.hubChecks.change ->
+       hub_id = this.id.match(/\d+/)[0]
+       hub_markers = "markersForHub" + hub_id
+       if this.checked
+         # Only load orders from the DB if they haven't been loaded yet
+         if SprigMap[hub_markers]
+           j = 0
+           while j < SprigMap[hub_markers].length
+             marker = SprigMap[hub_markers][j].serviceObject
+             marker.setVisible(true)
+             ++j
+         else
+           self.loadOrders(hub_id)
+       else
+         i = 0
+         while i < SprigMap[hub_markers].length
+           marker = SprigMap[hub_markers][i].serviceObject
+           marker.setVisible(false)
+           ++i
 
 )(jQuery, SprigMap)
 
