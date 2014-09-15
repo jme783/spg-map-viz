@@ -3,7 +3,7 @@
     <div class="map-controls">
       <div class="row">
         <div class="large-12">
-          <label class="filter-desc"><strong>Display by Hub</strong></label>
+          <label class="filter-desc"><strong>Hub</strong></label>
           <% @hubs.each do |hub| %>
             <div class="hubs-check-container hub-<%= hub.id  %>">
               <input class="hub-checks" id="hub-<%= hub.id %>" type="checkbox"><label class="hub-labels" for="hub-<%= hub.id %>">Hub <%= hub.id %></label>
@@ -11,19 +11,38 @@
           <% end %>
         </div>
       </div>
-      <label class="filter-desc"><strong>Display by Date Created</strong></label>
+      <label class="filter-desc"><strong>Date Ordered</strong></label>
       <table class="date-table">
           <thead>
             <tr>
             <th>Beginning:
-              <input type="text" class="large-6 columns dp-field" value="2014-03-29" id="dp4">
+              <input type="text" class="large-6 columns dp-field" value="2014-03-04" id="dp4">
             </th>
             <th>Ending:
-              <input type="text" class="large-6 columns dp-field" value="2014-04-02" id="dp5">
+              <input type="text" class="large-6 columns dp-field" value="2014-03-05" id="dp5">
             </th>
           </tr>
         </thead>
       </table>
+      <div class="row">
+        <div class="large-12">
+          <label class="filter-desc"><strong>Number of Items Ordered</strong>
+            <select class="number-items-select">
+              <option value="0">Any</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </label>
+        </div>
+      </div>
       <a href="#" class="search button small">Show Orders</a>
       <div class="key">
         <ul>

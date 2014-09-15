@@ -6,5 +6,6 @@ class Order < ActiveRecord::Base
   }
   scope :completed_before, -> (order_completed_at) {where(["order_completed_at < ?", DateTime.parse(order_completed_at)])}
   scope :completed_after, -> (order_completed_at) {where(["order_completed_at > ?", DateTime.parse(order_completed_at)])}
+  scope :num_items, -> (num_items) {where num_items: num_items}
 end
 

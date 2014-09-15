@@ -128,12 +128,14 @@ window.SprigMap = window.SprigMap || {}
   New::initializeDatePicker = ->
     self = this
     # implementation of disabled form fields
-    nowTemp = new Date()
-    now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0)
+    firstOrder = new Date("March 4, 2014 01:46:08")
+    lastOrder = new Date("April 1, 2014 04:44:18")
+    firstOrderFormatted = new Date(firstOrder.getFullYear(), firstOrder.getMonth(), firstOrder.getDate(), 0, 0, 0, 0)
+    lastOrderFormatted = new Date(lastOrder.getFullYear(), lastOrder.getMonth(), lastOrder.getDate(), 0, 0, 0, 0)
     startDate = $("#dp4").fdatepicker(
       format: "yyyy-mm-dd"
       onRender: (date) ->
-        if parseInt(date.valueOf()) > parseInt(now.valueOf()) 
+        if parseInt(date.valueOf()) > parseInt(lastOrderFormatted.valueOf()) || parseInt(date.valueOf()) < parseInt(firstOrderFormatted.valueOf())
           return "disabled"
     ).on("changeDate", (ev) ->
       if parseInt(ev.date.valueOf()) > parseInt(endDate.date.valueOf())
@@ -147,7 +149,7 @@ window.SprigMap = window.SprigMap || {}
     endDate = $("#dp5").fdatepicker(
       format: "yyyy-mm-dd"
       onRender: (date) ->
-        if parseInt(date.valueOf()) <= parseInt(startDate.date.valueOf())
+        if parseInt(date.valueOf()) <= parseInt(startDate.date.valueOf()) || parseInt(date.valueOf()) > parseInt(lastOrderFormatted.valueOf()) || parseInt(date.valueOf()) < parseInt(firstOrderFormatted.valueOf())
           return "disabled"
     ).on("changeDate", (ev) ->
       endDate.hide()
@@ -171,23 +173,32 @@ window.SprigMap = window.SprigMap || {}
     # Bound the markers to the map
     handler.bounds.extendWith markers
     handler.fitMapToBounds()
-    $(".ajax-loader").hide()
+    $(".ajax-loader").fadeOut(100)
 
 
    New::loadOrders = () ->
     before_date = $('#dp4').val()
     after_date = $('#dp5').val()
-    $(".ajax-loader").show()
+    $(".ajax-loader").fadeIn(100)
     self = this
     $.ajax
       url: "/orders"
       data:
-        hub_ids: self.activeHubs.join(","),
+        hub_ids: (if self.activeHubs.length > 0 then self.activeHubs.join(",") else "0"),
         completed_before: $('#dp5').val() ,
-        completed_after: $('#dp4').val()
+        completed_after: $('#dp4').val(),
+        num_items: (if $('.number-items-select').val() == "0" then "" else $('.number-items-select').val())
 
       success: (response) ->
-        self.addOrderMapMarkers(response)
+        if response.length != 0
+          self.addOrderMapMarkers(response)
+        else
+          alertHTML = '<div data-alert class="map-alert alert-box warning">Sorry, your search did not match any orders. Please try again</div>'
+          $(alertHTML).appendTo("body")
+          setTimeout ->
+            $('.map-alert').fadeOut(300)
+          , 2000
+          $(".ajax-loader").hide()
       error: (xhr) ->
         console.log(xhr)
 
@@ -196,7 +207,6 @@ window.SprigMap = window.SprigMap || {}
      self = this
      $('a.search').click (e) ->
        e.preventDefault()
-       console.log markersArray
        self.clearMarkers()
        self.loadOrders()
 
