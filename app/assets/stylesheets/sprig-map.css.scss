@@ -91,6 +91,12 @@
      label.hub-labels{
       margin-right: 1em;
     }
+    .key {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+    }
     .key ul {
       margin-left: 0;
       text-align: center;
@@ -98,6 +104,9 @@
         list-style-type: none;
         display: inline-block;
         position: relative;
+        p {
+          margin-bottom: 0;
+        }
         &.hub {
           padding-left: 23px;
         }

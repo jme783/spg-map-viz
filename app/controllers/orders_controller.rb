@@ -11,7 +11,7 @@ class OrdersController < ApplicationController
   private
 
   def filtering_params(params)
-    params.slice(:hub_id, :completed_before, :completed_after)
+    params.slice(:hub_ids, :completed_before, :completed_after)
   end
 
   def build_json orders

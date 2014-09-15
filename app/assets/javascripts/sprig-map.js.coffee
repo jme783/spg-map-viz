@@ -3,8 +3,11 @@ window.SprigMap = window.SprigMap || {}
   New = (options) ->
     this.hubs = options.hubs
     this.orders = options.orders
-    this.handler = Gmaps.build('Google')
     this.hubChecks = options.hubChecks
+    this.handler = Gmaps.build('Google')
+    this.dateFields = $('.dp-field')
+    this.activeHubs = []
+    window.markersArray = []
     # Style Google Maps
     this.style_array = [
       {
@@ -107,6 +110,7 @@ window.SprigMap = window.SprigMap || {}
     this.initializeMap()
     this.initializeDatePicker()
     this.hubCheckBoxChange()
+    this.showOrderClick()
 
   New::initializeMap = ->
     self = this
@@ -122,11 +126,12 @@ window.SprigMap = window.SprigMap || {}
       self.addHubMapMarkers self.hubs
 
   New::initializeDatePicker = ->
+    self = this
     # implementation of disabled form fields
     nowTemp = new Date()
     now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0)
     startDate = $("#dp4").fdatepicker(
-      format: "mm/dd/yyyy"
+      format: "yyyy-mm-dd"
       onRender: (date) ->
         if parseInt(date.valueOf()) > parseInt(now.valueOf()) 
           return "disabled"
@@ -140,7 +145,7 @@ window.SprigMap = window.SprigMap || {}
       return
     ).data("datepicker")
     endDate = $("#dp5").fdatepicker(
-      format: "mm/dd/yyyy"
+      format: "yyyy-mm-dd"
       onRender: (date) ->
         if parseInt(date.valueOf()) <= parseInt(startDate.date.valueOf())
           return "disabled"
@@ -154,53 +159,67 @@ window.SprigMap = window.SprigMap || {}
     markers = handler.addMarkers(hash, {opacity: 1, zIndex: 10, clickable: false})
     handler.bounds.extendWith markers
 
-  New::addOrderMapMarkers = (hash, hub_id) ->
-    handler = this.handler
+  New::addOrderMapMarkers = (hash) ->
+    self = this
+    i = 0
+    handler = self.handler
     markers = handler.addMarkers(hash, {zIndex: 1})
-    # Attach the markers to the SprigMap opject
-    markersNameVariable = "markersForHub" + hub_id
-    if !SprigMap[markersNameVariable]
-      SprigMap[markersNameVariable] = markers
+    while i < markers.length
+      marker = markers[i].serviceObject
+      window.markersArray.push(marker)
+      ++i
     # Bound the markers to the map
     handler.bounds.extendWith markers
     handler.fitMapToBounds()
     $(".ajax-loader").hide()
 
 
-   New::loadOrders = (hub_id) ->
+   New::loadOrders = () ->
+    before_date = $('#dp4').val()
+    after_date = $('#dp5').val()
     $(".ajax-loader").show()
     self = this
     $.ajax
       url: "/orders"
       data:
-        hub_id: hub_id
+        hub_ids: self.activeHubs.join(","),
+        completed_before: $('#dp5').val() ,
+        completed_after: $('#dp4').val()
 
       success: (response) ->
-        self.addOrderMapMarkers(response, hub_id)
+        self.addOrderMapMarkers(response)
       error: (xhr) ->
         console.log(xhr)
+
+
+   New::showOrderClick = ->
+     self = this
+     $('a.search').click (e) ->
+       e.preventDefault()
+       console.log markersArray
+       self.clearMarkers()
+       self.loadOrders()
 
    New::hubCheckBoxChange = ->
      self = this
      self.hubChecks.change ->
        hub_id = this.id.match(/\d+/)[0]
-       hub_markers = "markersForHub" + hub_id
        if this.checked
-         # Only load orders from the DB if they haven't been loaded yet
-         if SprigMap[hub_markers]
-           j = 0
-           while j < SprigMap[hub_markers].length
-             marker = SprigMap[hub_markers][j].serviceObject
-             marker.setVisible(true)
-             ++j
-         else
-           self.loadOrders(hub_id)
+         # Add hub to active list
+         self.activeHubs.push(hub_id)
        else
-         i = 0
-         while i < SprigMap[hub_markers].length
-           marker = SprigMap[hub_markers][i].serviceObject
-           marker.setVisible(false)
-           ++i
+         # Remove hub from active list
+         index = self.activeHubs.indexOf(hub_id)
+         if index > -1
+           self.activeHubs.splice(index, 1)
+
+    New::clearMarkers = ->
+      self = this
+      i = 0
+      while i < window.markersArray.length
+        window.markersArray[i].setVisible false
+        ++i
+      window.markersArray.length = 0
 
 )(jQuery, SprigMap)
 
