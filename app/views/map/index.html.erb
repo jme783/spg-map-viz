@@ -3,7 +3,7 @@
     <div class="map-controls">
       <div class="row">
         <div class="large-12">
-          <label class="filter-desc"><strong>Hub</strong></label>
+          <label class="filter-desc"><strong>Orders by Hub</strong></label>
           <% @hubs.each do |hub| %>
             <div class="hubs-check-container hub-<%= hub.id  %>">
               <input class="hub-checks" id="hub-<%= hub.id %>" type="checkbox"><label class="hub-labels" for="hub-<%= hub.id %>">Hub <%= hub.id %></label>

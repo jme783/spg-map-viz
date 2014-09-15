@@ -160,6 +160,11 @@ window.SprigMap = window.SprigMap || {}
     handler = this.handler
     markers = handler.addMarkers(hash, {opacity: 1, zIndex: 10, clickable: false})
     handler.bounds.extendWith markers
+    #Show some Orders on the map by default
+    $('#hub-1').prop('checked','checked')
+    this.activeHubs.push("1")
+    $('.search').click()
+
 
   New::addOrderMapMarkers = (hash) ->
     self = this
