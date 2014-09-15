@@ -12,6 +12,9 @@
     margin-top: 20vh;
   }
 }
+.button.alert.datepicker-close {
+  display: none;
+}
 .map-container {
   width: 100%;
   margin: 0;
@@ -36,12 +39,57 @@
     height: 80vh;
     background: #fff;
     border: 1px solid #999;
-    padding: 1.5em;
+    padding: 1.0em;
     .filter-desc {
       margin-bottom: 5px;
     }
-    .hub-checks label{
-      display: block;
+    table.date-table {
+      background: #fff;
+      border: none;
+      thead {
+        background: #fff;
+        th {
+          padding-left: 0;
+        }
+      }
+    }
+    .hubs-check-container {
+      display: inline-block;
+      margin-bottom: 1em;
+      padding-left: 5px;
+      padding-bottom: 2px;
+      border-left: 3px solid;
+      &.hub-1 {
+        border-left-color: #7993fe;
+      }
+      &.hub-2 {
+        border-left-color: #fe7993;
+      }
+      &.hub-4 {
+        border-left-color: #93fe79;
+      }
+      &.hub-5 {
+        border-left-color: #fea179;
+      }
+      &.hub-6 {
+        border-left-color: #959595;
+      }
+      &.hub-7 {
+        border-left-color: #fee379;
+      }
+      &.hub-8 {
+        border-left-color: #dc4300;
+      }
+      &.hub-9 {
+        border-left-color: #2646c9;
+      }
+    }
+    input.hub-checks {
+      margin-bottom: 0;
+      cursor: pointer;
+    }
+     label.hub-labels{
+      margin-right: 1em;
     }
     .key ul {
       margin-left: 0;

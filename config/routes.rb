@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   root 'map#index'
 
   # Orders API to filter by hub
-  get "orders" => "orders#find_by_hub", as: "orders"
+  get "orders" => "orders#find", as: "orders"
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

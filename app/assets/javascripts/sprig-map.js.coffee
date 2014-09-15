@@ -105,6 +105,7 @@ window.SprigMap = window.SprigMap || {}
 
   New::bind = ->
     this.initializeMap()
+    this.initializeDatePicker()
     this.hubCheckBoxChange()
 
   New::initializeMap = ->
@@ -120,6 +121,33 @@ window.SprigMap = window.SprigMap || {}
     , ->
       self.addHubMapMarkers self.hubs
 
+  New::initializeDatePicker = ->
+    # implementation of disabled form fields
+    nowTemp = new Date()
+    now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0)
+    startDate = $("#dp4").fdatepicker(
+      format: "mm/dd/yyyy"
+      onRender: (date) ->
+        if parseInt(date.valueOf()) > parseInt(now.valueOf()) 
+          return "disabled"
+    ).on("changeDate", (ev) ->
+      if parseInt(ev.date.valueOf()) > parseInt(endDate.date.valueOf())
+        newDate = new Date(ev.date)
+        newDate.setDate newDate.getDate() + 1
+        endDate.update newDate
+      startDate.hide()
+      $("#dp5")[0].focus()
+      return
+    ).data("datepicker")
+    endDate = $("#dp5").fdatepicker(
+      format: "mm/dd/yyyy"
+      onRender: (date) ->
+        if parseInt(date.valueOf()) <= parseInt(startDate.date.valueOf())
+          return "disabled"
+    ).on("changeDate", (ev) ->
+      endDate.hide()
+      return
+    ).data("datepicker")
 
   New::addHubMapMarkers = (hash) ->
     handler = this.handler

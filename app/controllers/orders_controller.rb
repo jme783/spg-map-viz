@@ -1,7 +1,21 @@
 class OrdersController < ApplicationController
-  def find_by_hub
-    @orders = Order.where("hub_id = ?", params[:hub_id])
-    @orders_hash = Gmaps4rails.build_markers(@orders) do |order, marker|
+  def find
+    @orders = Order.where(nil)
+    filtering_params(params).each do |key, value|
+      @orders = @orders.public_send(key, value) if value.present?
+    end
+      render :json => build_json(@orders)
+      return false
+  end
+
+  private
+
+  def filtering_params(params)
+    params.slice(:hub_id, :completed_before, :completed_after)
+  end
+
+  def build_json orders
+    @orders_hash = Gmaps4rails.build_markers(orders) do |order, marker|
       marker.lat order.latitude
       marker.lng order.longitude
       marker.title "Order #" + order.id.to_s
@@ -11,7 +25,6 @@ class OrdersController < ApplicationController
          :height  => 16
       })
     end
-      render :json => @orders_hash.to_json
-      return false
+    return @orders_hash.to_json
   end
 end
